@@ -32,3 +32,18 @@ export interface Category {
   name: string;
   url: string;
 }
+
+export type SortOption =
+  | ""
+  | "price-asc"
+  | "price-desc"
+  | "rating-desc"
+  | "title-asc";
+
+export interface CatalogParams {
+  q?: string;
+  category?: string;
+  sort?: SortOption;
+  page?: number;
+  limit?: number;
+}

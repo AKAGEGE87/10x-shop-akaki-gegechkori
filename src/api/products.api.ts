@@ -1,26 +1,42 @@
-import { Product, ProductsResponse } from "../types/product";
-
-const BASE_URL = "https://dummyjson.com";
+import { apiClient } from "./ApiClient";
+import {
+  Product,
+  ProductsResponse,
+  Category,
+  CatalogParams,
+} from "../types/product";
+import { buildProductsUrl } from "../utils/url";
 
 export async function fetchProducts(
-  limit = 12,
-  skip = 0
+  paramsOrLimit: CatalogParams | number = 12,
+  skipOrSignal?: number | AbortSignal,
+  maybeSignal?: AbortSignal
 ): Promise<ProductsResponse> {
-  const res = await fetch(`${BASE_URL}/products?limit=${limit}&skip=${skip}`);
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
+  if (typeof paramsOrLimit === "number") {
+    const limit = paramsOrLimit;
+    const skip = typeof skipOrSignal === "number" ? skipOrSignal : 0;
+    const page = Math.floor(skip / limit) + 1;
+    const signal =
+      skipOrSignal instanceof AbortSignal ? skipOrSignal : maybeSignal;
+    const url = buildProductsUrl({ limit, page });
+    return apiClient.get<ProductsResponse>(url, signal);
   }
 
-  return res.json() as Promise<ProductsResponse>;
+  const signal =
+    skipOrSignal instanceof AbortSignal ? skipOrSignal : maybeSignal;
+  const url = buildProductsUrl(paramsOrLimit);
+  return apiClient.get<ProductsResponse>(url, signal);
 }
 
-export async function fetchProductById(id: number): Promise<Product> {
-  const res = await fetch(`${BASE_URL}/products/${id}`);
+export async function fetchProductById(
+  id: number,
+  signal?: AbortSignal
+): Promise<Product> {
+  return apiClient.get<Product>(`/products/${id}`, signal);
+}
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch product with id ${id}: ${res.status} ${res.statusText}`);
-  }
-
-  return res.json() as Promise<Product>;
+export async function fetchCategories(
+  signal?: AbortSignal
+): Promise<Category[]> {
+  return apiClient.get<Category[]>("/products/categories", signal);
 }
