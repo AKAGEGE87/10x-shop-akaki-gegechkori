@@ -18,6 +18,8 @@ export function Header() {
         : "text-slate-600 hover:text-slate-900"
     }`;
 
+  const cartItemCount = 0;
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
@@ -36,9 +38,11 @@ export function Header() {
           <NavLink to="/cart" className={navLinkClass}>
             <span className="flex items-center gap-1.5">
               <span>Cart</span>
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-semibold text-slate-700">
-                0
-              </span>
+              {cartItemCount > 0 && (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-xs font-semibold text-white">
+                  {cartItemCount}
+                </span>
+              )}
             </span>
           </NavLink>
 
