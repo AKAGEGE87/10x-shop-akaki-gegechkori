@@ -1,9 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { Container } from "../ui/Container";
 
 export function Header() {
   const { user, logout } = useAuth();
+  const { itemCount } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,8 +19,6 @@ export function Header() {
         ? "text-indigo-600 font-semibold"
         : "text-slate-600 hover:text-slate-900"
     }`;
-
-  const cartItemCount = 0;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -38,9 +38,9 @@ export function Header() {
           <NavLink to="/cart" className={navLinkClass}>
             <span className="flex items-center gap-1.5">
               <span>Cart</span>
-              {cartItemCount > 0 && (
+              {itemCount > 0 && (
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-xs font-semibold text-white">
-                  {cartItemCount}
+                  {itemCount}
                 </span>
               )}
             </span>

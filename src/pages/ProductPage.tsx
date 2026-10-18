@@ -6,10 +6,12 @@ import { Container } from "../components/ui/Container";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { NotFoundPage } from "./NotFoundPage";
 import { formatPrice, discountedPrice } from "../utils/format";
+import { useCart } from "../context/CartContext";
 
 export function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addItem } = useCart();
 
   const numericId = Number(id);
   const isValidId = Boolean(id && Number.isInteger(numericId) && numericId > 0);
@@ -107,7 +109,16 @@ export function ProductPage() {
     if (isOutOfStock || quantity < 1) {
       return;
     }
-    setFeedback(`Added ${quantity} item${quantity > 1 ? "s" : ""} to cart ✓`);
+    const result = addItem(product, quantity);
+    if (result.reachedLimit && !result.success) {
+      setFeedback("Maximum stock reached in cart");
+    } else if (result.reachedLimit) {
+      setFeedback(
+        `Added ${quantity} item${quantity > 1 ? "s" : ""} to cart ✓ (Maximum stock reached)`
+      );
+    } else {
+      setFeedback(`Added ${quantity} item${quantity > 1 ? "s" : ""} to cart ✓`);
+    }
     window.setTimeout(() => {
       setFeedback(null);
     }, 3000);

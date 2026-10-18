@@ -4,12 +4,15 @@ import { Product, ProductsResponse } from "../types/product";
 import { ProductGrid } from "../components/product/ProductGrid";
 import { Container } from "../components/ui/Container";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { useCart } from "../context/CartContext";
 
 export function CatalogPage() {
   const [data, setData] = useState<ProductsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+
+  const { addItem } = useCart();
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -32,7 +35,14 @@ export function CatalogPage() {
   }, [loadProducts]);
 
   const handleAddToCart = (product: Product) => {
-    setFeedback(`Added "${product.title}" to cart`);
+    const result = addItem(product, 1);
+    if (result.reachedLimit && !result.success) {
+      setFeedback(`Maximum stock reached for "${product.title}"`);
+    } else if (result.reachedLimit) {
+      setFeedback(`Added "${product.title}" to cart ✓ (Maximum stock reached)`);
+    } else {
+      setFeedback(`Added "${product.title}" to cart ✓`);
+    }
     window.setTimeout(() => {
       setFeedback(null);
     }, 3000);
