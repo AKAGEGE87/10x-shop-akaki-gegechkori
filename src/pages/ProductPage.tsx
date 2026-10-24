@@ -104,6 +104,30 @@ export function ProductPage() {
     return allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
   }, [allReviews, product]);
 
+  const handleAddToCart = useCallback(() => {
+    if (!product || product.stock === 0 || quantity < 1) {
+      return;
+    }
+    const result = addItem(product, quantity);
+    if (!result.success) {
+      showToast("Maximum stock reached in cart", "error");
+      return;
+    }
+    showToast("Added to cart ✓", "success");
+  }, [product, quantity, addItem, showToast]);
+
+  const handleAddRelated = useCallback(
+    (related: Product) => {
+      const result = addItem(related, 1);
+      if (!result.success) {
+        showToast("Maximum stock reached in cart", "error");
+        return;
+      }
+      showToast("Added to cart ✓", "success");
+    },
+    [addItem, showToast]
+  );
+
   if (!isValidId || is404) {
     return <NotFoundPage />;
   }
@@ -152,27 +176,6 @@ export function ProductPage() {
 
   const handleIncrease = () => {
     setQuantity((prev) => Math.min(product.stock, prev + 1));
-  };
-
-  const handleAddToCart = () => {
-    if (isOutOfStock || quantity < 1) {
-      return;
-    }
-    const result = addItem(product, quantity);
-    if (!result.success) {
-      showToast("Maximum stock reached in cart", "error");
-      return;
-    }
-    showToast("Added to cart ✓", "success");
-  };
-
-  const handleAddRelated = (related: Product) => {
-    const result = addItem(related, 1);
-    if (!result.success) {
-      showToast("Maximum stock reached in cart", "error");
-      return;
-    }
-    showToast("Added to cart ✓", "success");
   };
 
   return (

@@ -1,6 +1,7 @@
 import {
   useState,
   useEffect,
+  useCallback,
   type ChangeEvent,
 } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -155,14 +156,17 @@ export function CatalogPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleAddToCart = (product: Product) => {
-    const result = addItem(product, 1);
-    if (!result.success) {
-      showToast("Maximum stock reached in cart", "error");
-      return;
-    }
-    showToast("Added to cart ✓", "success");
-  };
+  const handleAddToCart = useCallback(
+    (product: Product) => {
+      const result = addItem(product, 1);
+      if (!result.success) {
+        showToast("Maximum stock reached in cart", "error");
+        return;
+      }
+      showToast("Added to cart ✓", "success");
+    },
+    [addItem, showToast]
+  );
 
   const total = data?.total ?? 0;
   const limit = 12;

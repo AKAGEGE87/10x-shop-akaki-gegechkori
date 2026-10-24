@@ -1,4 +1,4 @@
-import type { MouseEvent } from "react";
+import { memo, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "../../types/product";
 import { formatPrice, discountedPrice } from "../../utils/format";
@@ -8,7 +8,10 @@ interface ProductCardProps {
   onAdd?: (product: Product) => void;
 }
 
-export function ProductCard({ product, onAdd }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({
+  product,
+  onAdd,
+}: ProductCardProps) {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -107,4 +110,4 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
       </div>
     </article>
   );
-}
+});
