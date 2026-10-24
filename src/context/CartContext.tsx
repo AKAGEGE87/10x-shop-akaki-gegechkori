@@ -1,13 +1,17 @@
 import {
   createContext,
+  useCallback,
   useContext,
-  useState,
   useEffect,
+  useMemo,
+  useReducer,
   type ReactNode,
 } from "react";
-import { CartItem } from "../types/cart";
-import { Product } from "../types/product";
-import { discountedPrice } from "../utils/format";
+import type { CartItem, CartState } from "../types/cart";
+import type { Product } from "../types/product";
+import { Cart } from "../models/Cart";
+import { cartStorage } from "../models/cartStorage";
+import { cartReducer } from "./cart.reducer";
 
 interface AddItemResult {
   success: boolean;
@@ -16,140 +20,138 @@ interface AddItemResult {
 
 interface CartContextType {
   items: CartItem[];
+  promoCode: string | null;
   itemCount: number;
   subtotal: number;
-  totalDiscount: number;
+  discount: number;
+  shippingCost: number;
   total: number;
   addItem: (product: Product, qty?: number) => AddItemResult;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, qty: number) => void;
   clearCart: () => void;
+  applyPromo: (code: string) => boolean;
+  removePromo: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-function loadInitialCart(): CartItem[] {
-  try {
-    const raw = localStorage.getItem("shop_cart");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    const list = Array.isArray(parsed) ? parsed : parsed?.items;
-    if (Array.isArray(list)) {
-      return list.filter(
-        (i): i is CartItem =>
-          typeof i?.productId === "number" &&
-          typeof i?.title === "string" &&
-          typeof i?.price === "number" &&
-          typeof i?.quantity === "number" &&
-          i.quantity > 0
-      );
-    }
-  } catch {
-    return [];
+const initialState: CartState = { items: [], promoCode: null };
+
+function isCartItem(value: unknown): value is CartItem {
+  if (typeof value !== "object" || value === null) {
+    return false;
   }
-  return [];
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.productId === "number" &&
+    typeof item.title === "string" &&
+    typeof item.thumbnail === "string" &&
+    typeof item.price === "number" &&
+    typeof item.discountPercentage === "number" &&
+    typeof item.stock === "number" &&
+    typeof item.quantity === "number" &&
+    item.quantity > 0
+  );
+}
+
+function initCartState(fallback: CartState): CartState {
+  const stored: unknown = cartStorage.get();
+  if (typeof stored !== "object" || stored === null) {
+    return fallback;
+  }
+
+  const { items, promoCode } = stored as Record<string, unknown>;
+  if (!Array.isArray(items)) {
+    return fallback;
+  }
+
+  return {
+    items: items.filter(isCartItem),
+    promoCode: typeof promoCode === "string" ? promoCode : null,
+  };
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(loadInitialCart);
+  const [state, dispatch] = useReducer(cartReducer, initialState, initCartState);
 
   useEffect(() => {
-    try {
-      localStorage.setItem("shop_cart", JSON.stringify({ items }));
-    } catch {
-      // storage quota exceeded or unavailable
-    }
-  }, [items]);
+    cartStorage.set(state);
+  }, [state]);
 
-  const addItem = (product: Product, qty = 1): AddItemResult => {
-    if (product.stock <= 0 || qty <= 0) {
-      return { success: false, reachedLimit: true };
-    }
-
-    const existing = items.find((i) => i.productId === product.id);
-    const currentQty = existing ? existing.quantity : 0;
-
-    if (currentQty >= product.stock) {
-      return { success: false, reachedLimit: true };
-    }
-
-    const nextQty = Math.min(currentQty + qty, product.stock);
-    const reachedLimit = nextQty >= product.stock;
-
-    if (existing) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.productId === product.id ? { ...i, quantity: nextQty } : i
-        )
-      );
-    } else {
-      const newItem: CartItem = {
-        productId: product.id,
-        title: product.title,
-        thumbnail: product.thumbnail,
-        price: product.price,
-        discountPercentage: product.discountPercentage,
-        stock: product.stock,
-        quantity: nextQty,
-      };
-      setItems((prev) => [...prev, newItem]);
-    }
-
-    return { success: true, reachedLimit };
-  };
-
-  const removeItem = (productId: number) => {
-    setItems((prev) => prev.filter((i) => i.productId !== productId));
-  };
-
-  const updateQuantity = (productId: number, qty: number) => {
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.productId === productId) {
-          const clamped = Math.max(1, Math.min(qty, item.stock));
-          return { ...item, quantity: clamped };
-        }
-        return item;
-      })
-    );
-  };
-
-  const clearCart = () => {
-    setItems([]);
-  };
-
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const cart = useMemo(
+    () => new Cart(state.items, state.promoCode),
+    [state.items, state.promoCode]
   );
 
-  const total = items.reduce(
-    (sum, item) =>
-      sum + discountedPrice(item.price, item.discountPercentage) * item.quantity,
-    0
+  const addItem = useCallback(
+    (product: Product, qty = 1): AddItemResult => {
+      const existing = state.items.find((i) => i.productId === product.id);
+      const currentQty = existing ? existing.quantity : 0;
+
+      if (product.stock <= 0 || qty <= 0 || currentQty >= product.stock) {
+        return { success: false, reachedLimit: true };
+      }
+
+      dispatch({ type: "ADD_ITEM", product, qty });
+      return { success: true, reachedLimit: currentQty + qty >= product.stock };
+    },
+    [state.items]
   );
 
-  const totalDiscount = Math.max(0, subtotal - total);
+  const removeItem = useCallback((productId: number) => {
+    dispatch({ type: "REMOVE_ITEM", productId });
+  }, []);
 
-  return (
-    <CartContext.Provider
-      value={{
-        items,
-        itemCount,
-        subtotal,
-        totalDiscount,
-        total,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const updateQuantity = useCallback((productId: number, qty: number) => {
+    dispatch({ type: "SET_QTY", productId, qty });
+  }, []);
+
+  const clearCart = useCallback(() => {
+    dispatch({ type: "CLEAR" });
+  }, []);
+
+  const applyPromo = useCallback((code: string): boolean => {
+    if (code.trim().toUpperCase() !== Cart.VALID_PROMO) {
+      return false;
+    }
+    dispatch({ type: "APPLY_PROMO", code });
+    return true;
+  }, []);
+
+  const removePromo = useCallback(() => {
+    dispatch({ type: "REMOVE_PROMO" });
+  }, []);
+
+  const value = useMemo<CartContextType>(
+    () => ({
+      items: state.items,
+      promoCode: state.promoCode,
+      itemCount: cart.itemCount,
+      subtotal: cart.subtotal(),
+      discount: cart.discount(),
+      shippingCost: cart.shipping(),
+      total: cart.total(),
+      addItem,
+      removeItem,
+      updateQuantity,
+      clearCart,
+      applyPromo,
+      removePromo,
+    }),
+    [
+      state,
+      cart,
+      addItem,
+      removeItem,
+      updateQuantity,
+      clearCart,
+      applyPromo,
+      removePromo,
+    ]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart(): CartContextType {

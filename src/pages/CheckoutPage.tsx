@@ -23,7 +23,7 @@ interface PlacedOrderSummary {
 
 export function CheckoutPage() {
   const { user } = useAuth();
-  const { items, itemCount, subtotal, totalDiscount, total, clearCart } =
+  const { items, itemCount, subtotal, discount, total, clearCart } =
     useCart();
 
   const [fullName, setFullName] = useState(user?.username || "");
@@ -386,10 +386,10 @@ export function CheckoutPage() {
               </dd>
             </div>
 
-            {totalDiscount > 0 && (
+            {discount > 0 && (
               <div className="flex justify-between text-emerald-600">
                 <dt>Discount</dt>
-                <dd className="font-medium">-{formatPrice(totalDiscount)}</dd>
+                <dd className="font-medium">-{formatPrice(discount)}</dd>
               </div>
             )}
 
