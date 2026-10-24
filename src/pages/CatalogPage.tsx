@@ -17,6 +17,7 @@ import { Pagination } from "../components/ui/Pagination";
 import { Container } from "../components/ui/Container";
 import { useDebounce } from "../hooks/useDebounce";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 import { discountedPrice } from "../utils/format";
 
 export function CatalogPage() {
@@ -34,10 +35,10 @@ export function CatalogPage() {
   const [data, setData] = useState<ProductsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
   const { addItem } = useCart();
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchCategories()
@@ -156,16 +157,11 @@ export function CatalogPage() {
 
   const handleAddToCart = (product: Product) => {
     const result = addItem(product, 1);
-    if (result.reachedLimit && !result.success) {
-      setFeedback(`Maximum stock reached for "${product.title}"`);
-    } else if (result.reachedLimit) {
-      setFeedback(`Added "${product.title}" to cart ✓ (Maximum stock reached)`);
-    } else {
-      setFeedback(`Added "${product.title}" to cart ✓`);
+    if (!result.success) {
+      showToast("Maximum stock reached in cart", "error");
+      return;
     }
-    window.setTimeout(() => {
-      setFeedback(null);
-    }, 3000);
+    showToast("Added to cart ✓", "success");
   };
 
   const total = data?.total ?? 0;
@@ -189,12 +185,6 @@ export function CatalogPage() {
               : "0 products found"}
           </p>
         </div>
-
-        {feedback && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-sm font-medium text-emerald-800 shadow-xs">
-            {feedback}
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-12">

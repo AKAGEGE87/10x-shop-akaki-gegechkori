@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 import { Container } from "../components/ui/Container";
 import { CartItemRow } from "../components/cart/CartItemRow";
 import { formatPrice } from "../utils/format";
@@ -7,11 +8,13 @@ import { formatPrice } from "../utils/format";
 export function CartPage() {
   const { items, itemCount, subtotal, totalDiscount, total, clearCart } =
     useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleClearCart = () => {
     if (window.confirm("Clear the cart? This cannot be undone.")) {
       clearCart();
+      showToast("Removed from cart", "info");
     }
   };
 

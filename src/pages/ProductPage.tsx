@@ -7,11 +7,13 @@ import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { NotFoundPage } from "./NotFoundPage";
 import { formatPrice, discountedPrice } from "../utils/format";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 
 export function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { showToast } = useToast();
 
   const numericId = Number(id);
   const isValidId = Boolean(id && Number.isInteger(numericId) && numericId > 0);
@@ -22,7 +24,6 @@ export function ProductPage() {
   const [is404, setIs404] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [feedback, setFeedback] = useState<string | null>(null);
 
   const loadProduct = useCallback(async () => {
     if (!isValidId) {
@@ -110,18 +111,11 @@ export function ProductPage() {
       return;
     }
     const result = addItem(product, quantity);
-    if (result.reachedLimit && !result.success) {
-      setFeedback("Maximum stock reached in cart");
-    } else if (result.reachedLimit) {
-      setFeedback(
-        `Added ${quantity} item${quantity > 1 ? "s" : ""} to cart ✓ (Maximum stock reached)`
-      );
-    } else {
-      setFeedback(`Added ${quantity} item${quantity > 1 ? "s" : ""} to cart ✓`);
+    if (!result.success) {
+      showToast("Maximum stock reached in cart", "error");
+      return;
     }
-    window.setTimeout(() => {
-      setFeedback(null);
-    }, 3000);
+    showToast("Added to cart ✓", "success");
   };
 
   return (
@@ -238,12 +232,6 @@ export function ProductPage() {
           </div>
 
           <div className="space-y-4 border-t border-slate-100 pt-6">
-            {feedback && (
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-800 shadow-xs">
-                {feedback}
-              </div>
-            )}
-
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="flex items-center rounded-lg border border-slate-200 bg-white">
                 <button

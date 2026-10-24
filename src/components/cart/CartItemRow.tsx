@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { CartItem } from "../../types/cart";
 import { useCart } from "../../context/CartContext";
+import { useToast } from "../../context/ToastContext";
 import { formatPrice, discountedPrice } from "../../utils/format";
 
 interface CartItemRowProps {
@@ -9,6 +10,12 @@ interface CartItemRowProps {
 
 export function CartItemRow({ item }: CartItemRowProps) {
   const { updateQuantity, removeItem } = useCart();
+  const { showToast } = useToast();
+
+  const handleRemove = () => {
+    removeItem(item.productId);
+    showToast("Removed from cart", "info");
+  };
 
   const unitDiscountedPrice = discountedPrice(
     item.price,
@@ -76,7 +83,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
 
         <button
           type="button"
-          onClick={() => removeItem(item.productId)}
+          onClick={handleRemove}
           className="cursor-pointer text-sm font-medium text-red-600 transition hover:text-red-800"
         >
           Remove
