@@ -1,20 +1,45 @@
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 import { Container } from "../components/ui/Container";
 import { CartItemRow } from "../components/cart/CartItemRow";
+import { Cart } from "../models/Cart";
 import { formatPrice } from "../utils/format";
 
 export function CartPage() {
-  const { items, itemCount, subtotal, discount, total, clearCart } =
-    useCart();
+  const {
+    items,
+    itemCount,
+    promoCode,
+    subtotal,
+    discount,
+    shippingCost,
+    total,
+    clearCart,
+    applyPromo,
+    removePromo,
+  } = useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   const handleClearCart = () => {
     if (window.confirm("Clear the cart? This cannot be undone.")) {
       clearCart();
       showToast("Removed from cart", "info");
+    }
+  };
+
+  const handleApplyPromo = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (applyPromo(promoInput)) {
+      setPromoInput("");
+      setPromoError(null);
+    } else {
+      setPromoError("Invalid promo code");
     }
   };
 
@@ -80,23 +105,79 @@ export function CartPage() {
               </dd>
             </div>
 
-            {discount > 0 && (
-              <div className="flex justify-between text-emerald-600">
-                <dt>Discount</dt>
+            {promoCode && discount > 0 && (
+              <div className="flex items-center justify-between text-emerald-600">
+                <dt className="flex items-center gap-2">
+                  <span>Discount ({promoCode} −10%)</span>
+                  <button
+                    type="button"
+                    onClick={removePromo}
+                    className="cursor-pointer text-xs font-medium text-slate-500 underline transition hover:text-red-600"
+                  >
+                    Remove
+                  </button>
+                </dt>
                 <dd className="font-medium">-{formatPrice(discount)}</dd>
               </div>
             )}
 
             <div className="flex justify-between text-slate-600">
               <dt>Shipping</dt>
-              <dd className="font-medium text-slate-900">Free</dd>
+              <dd className="font-medium text-slate-900">
+                {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
+              </dd>
             </div>
+            {shippingCost > 0 && (
+              <p className="text-xs text-slate-500">
+                Free shipping on orders from{" "}
+                {formatPrice(Cart.FREE_SHIPPING_FROM)}
+              </p>
+            )}
 
             <div className="border-t border-slate-200 pt-3 flex justify-between text-base font-bold text-slate-900">
               <dt>Total</dt>
               <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
+
+          {!promoCode && (
+            <form onSubmit={handleApplyPromo} noValidate className="mt-6">
+              <label
+                htmlFor="promo"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Promo code
+              </label>
+              <div className="mt-1.5 flex gap-2">
+                <input
+                  id="promo"
+                  type="text"
+                  value={promoInput}
+                  onChange={(e) => {
+                    setPromoInput(e.target.value);
+                    if (promoError) {
+                      setPromoError(null);
+                    }
+                  }}
+                  className={`min-w-0 flex-1 rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 ${
+                    promoError
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-200"
+                      : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-200"
+                  }`}
+                  placeholder="Enter code"
+                />
+                <button
+                  type="submit"
+                  className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+                >
+                  Apply
+                </button>
+              </div>
+              {promoError && (
+                <p className="mt-1 text-xs text-red-600">{promoError}</p>
+              )}
+            </form>
+          )}
 
           <button
             type="button"
