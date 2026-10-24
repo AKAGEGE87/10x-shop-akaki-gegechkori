@@ -30,7 +30,7 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
   return (
     <article
       onClick={handleCardClick}
-      className="group flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-indigo-500"
+      className="group flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-brand-500"
     >
       <div>
         <div className="relative aspect-square w-full overflow-hidden bg-slate-100">
@@ -66,7 +66,7 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
             {product.brand ? ` · ${product.brand}` : ""}
           </p>
 
-          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
+          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-brand-600">
             {product.title}
           </h3>
 
@@ -98,7 +98,7 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
           type="button"
           disabled={isOutOfStock}
           onClick={handleAddToCart}
-          className="cursor-pointer flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+          className="cursor-pointer flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
         >
           {isOutOfStock ? "Out of stock" : "Add to cart"}
         </button>
