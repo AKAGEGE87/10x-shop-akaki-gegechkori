@@ -23,7 +23,7 @@ export default tseslint.config(
         "warn",
         {
           allowConstantExport: true,
-          allowExportNames: ["useAuth", "useCart", "useToast"],
+          allowExportNames: ["useAuth", "useCart", "useToast", "useTheme"],
         },
       ],
       "@typescript-eslint/no-explicit-any": "error",

@@ -1,4 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { ToastProvider } from "./context/ToastContext";
@@ -9,16 +10,18 @@ import { AppRoutes } from "./routes/AppRoutes";
 export default function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <ScrollToTop />
-              <AppRoutes />
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <ScrollToTop />
+                <AppRoutes />
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
