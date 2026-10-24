@@ -40,3 +40,15 @@ export async function fetchCategories(
 ): Promise<Category[]> {
   return apiClient.get<Category[]>("/products/categories", signal);
 }
+
+export async function fetchRelatedProducts(
+  category: string,
+  currentProductId: number,
+  signal?: AbortSignal
+): Promise<Product[]> {
+  const res = await apiClient.get<ProductsResponse>(
+    `/products/category/${encodeURIComponent(category)}?limit=5`,
+    signal
+  );
+  return res.products.filter((p) => p.id !== currentProductId).slice(0, 4);
+}

@@ -97,7 +97,7 @@ export function ProductReviews({
     setLocalReviews(nextLocal);
     setRating(0);
     setComment("");
-    onChange?.([...nextLocal, ...apiReviews]);
+    onChange?.(nextLocal);
     showToast("Review added ✓", "success");
   };
 

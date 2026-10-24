@@ -1,13 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { fetchProductById } from "../api/products.api";
-import { Product } from "../types/product";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { fetchProductById, fetchRelatedProducts } from "../api/products.api";
+import { Product, Review } from "../types/product";
 import { Container } from "../components/ui/Container";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { ProductGrid } from "../components/product/ProductGrid";
+import { ProductReviews } from "../components/product/ProductReviews";
 import { NotFoundPage } from "./NotFoundPage";
 import { formatPrice, discountedPrice } from "../utils/format";
+import { reviewsStorage } from "../models/reviewsStorage";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
+
+type ProductTab = "description" | "reviews";
 
 export function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +29,9 @@ export function ProductPage() {
   const [is404, setIs404] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState<ProductTab>("description");
+  const [localReviews, setLocalReviews] = useState<Review[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   const loadProduct = useCallback(async () => {
     if (!isValidId) {
@@ -55,6 +63,46 @@ export function ProductPage() {
   useEffect(() => {
     loadProduct();
   }, [loadProduct]);
+
+  useEffect(() => {
+    setActiveTab("description");
+    setRelatedProducts([]);
+    setLocalReviews(reviewsStorage.get()?.[numericId] ?? []);
+  }, [numericId]);
+
+  const productId = product?.id;
+  const productCategory = product?.category;
+
+  useEffect(() => {
+    if (productId === undefined || !productCategory) {
+      return;
+    }
+
+    const controller = new AbortController();
+    fetchRelatedProducts(productCategory, productId, controller.signal)
+      .then(setRelatedProducts)
+      .catch(() => {
+        setRelatedProducts([]);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [productId, productCategory]);
+
+  const allReviews = useMemo(
+    () => [...localReviews, ...(product?.reviews ?? [])],
+    [localReviews, product]
+  );
+
+  const totalReviewsCount = allReviews.length;
+
+  const averageRating = useMemo(() => {
+    if (allReviews.length === 0) {
+      return product?.rating ?? 0;
+    }
+    return allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+  }, [allReviews, product]);
 
   if (!isValidId || is404) {
     return <NotFoundPage />;
@@ -118,6 +166,15 @@ export function ProductPage() {
     showToast("Added to cart ✓", "success");
   };
 
+  const handleAddRelated = (related: Product) => {
+    const result = addItem(related, 1);
+    if (!result.success) {
+      showToast("Maximum stock reached in cart", "error");
+      return;
+    }
+    showToast("Added to cart ✓", "success");
+  };
+
   return (
     <Container className="space-y-8 py-4">
       <div>
@@ -174,7 +231,12 @@ export function ProductPage() {
           <div className="space-y-4">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {product.category}
+                <Link
+                  to={`/?category=${encodeURIComponent(product.category)}`}
+                  className="transition hover:text-indigo-600 hover:underline"
+                >
+                  {product.category}
+                </Link>
                 {product.brand ? ` · ${product.brand}` : ""}
               </p>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
@@ -186,7 +248,10 @@ export function ProductPage() {
               <div className="flex items-center gap-1 text-sm font-semibold text-amber-500">
                 <span>★</span>
                 <span className="text-slate-900">
-                  {product.rating.toFixed(1)}
+                  {averageRating.toFixed(1)}
+                </span>
+                <span className="font-medium text-slate-500">
+                  · {totalReviewsCount} {totalReviewsCount === 1 ? "review" : "reviews"}
                 </span>
               </div>
               <span className="text-slate-300">|</span>
@@ -221,13 +286,6 @@ export function ProductPage() {
                   </span>
                 </>
               )}
-            </div>
-
-            <div className="border-t border-slate-100 pt-4">
-              <h2 className="text-sm font-medium text-slate-900">Description</h2>
-              <p className="mt-2 text-base leading-relaxed text-slate-600">
-                {product.description}
-              </p>
             </div>
           </div>
 
@@ -267,6 +325,57 @@ export function ProductPage() {
           </div>
         </div>
       </div>
+
+      <section className="space-y-6">
+        <div
+          role="tablist"
+          aria-label="Product information"
+          className="flex gap-6 border-b border-slate-200"
+        >
+          {(
+            [
+              { key: "description", label: "Description" },
+              { key: "reviews", label: `Reviews (${totalReviewsCount})` },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`cursor-pointer -mb-px border-b-2 pb-3 text-sm font-semibold transition focus:outline-none ${
+                activeTab === tab.key
+                  ? "border-indigo-600 text-indigo-600"
+                  : "border-transparent text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "description" ? (
+          <p className="max-w-3xl text-base leading-relaxed text-slate-600">
+            {product.description}
+          </p>
+        ) : (
+          <ProductReviews
+            productId={product.id}
+            apiReviews={product.reviews ?? []}
+            onChange={setLocalReviews}
+          />
+        )}
+      </section>
+
+      {relatedProducts.length > 0 && (
+        <section className="space-y-6">
+          <h2 className="text-xl font-bold tracking-tight text-slate-900">
+            Related products
+          </h2>
+          <ProductGrid products={relatedProducts} onAdd={handleAddRelated} />
+        </section>
+      )}
     </Container>
   );
 }
