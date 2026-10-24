@@ -4,6 +4,9 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { Container } from "../components/ui/Container";
 import { formatPrice, discountedPrice } from "../utils/format";
+import { OrderModel } from "../models/Order";
+import { ordersStorage } from "../models/ordersStorage";
+import type { Order } from "../types/order";
 
 interface FormErrors {
   fullName?: string;
@@ -12,20 +15,10 @@ interface FormErrors {
   city?: string;
 }
 
-interface PlacedOrderSummary {
-  fullName: string;
-  email: string;
-  address: string;
-  city: string;
-  total: number;
-  itemCount: number;
-}
-
 export function CheckoutPage() {
   const { user } = useAuth();
   const {
     items,
-    itemCount,
     promoCode,
     subtotal,
     discount,
@@ -41,7 +34,7 @@ export function CheckoutPage() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [placedOrder, setPlacedOrder] = useState<PlacedOrderSummary | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<Order | null>(null);
 
   const validate = (): boolean => {
     const nextErrors: FormErrors = {};
@@ -76,21 +69,34 @@ export function CheckoutPage() {
 
     setIsSubmitting(true);
 
-    const orderSnapshot: PlacedOrderSummary = {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      address: address.trim(),
-      city: city.trim(),
+    const existingOrders = ordersStorage.get() || [];
+    const newOrder = OrderModel.create({
+      items: [...items],
+      shipping: {
+        fullName: fullName.trim(),
+        email: email.trim(),
+        address: address.trim(),
+        city: city.trim(),
+      },
+      subtotal,
+      discount,
+      shippingCost,
       total,
-      itemCount,
-    };
+      existingOrdersCount: existingOrders.length,
+    });
 
-    setPlacedOrder(orderSnapshot);
+    ordersStorage.set([newOrder, ...existingOrders]);
+    setPlacedOrder(newOrder);
     clearCart();
     setIsSubmitting(false);
   };
 
   if (placedOrder) {
+    const itemsCount = placedOrder.items.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+
     return (
       <Container className="py-12">
         <div className="mx-auto max-w-xl rounded-2xl border border-emerald-200 bg-white p-6 text-center shadow-xs sm:p-8">
@@ -114,7 +120,7 @@ export function CheckoutPage() {
             Thank you! Your order has been placed.
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            We have received your order and will begin processing it shortly.
+            Order #{placedOrder.number} has been received and will begin processing shortly.
           </p>
 
           <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-6 text-left">
@@ -124,30 +130,37 @@ export function CheckoutPage() {
 
             <dl className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
+                <dt className="text-slate-500">Order Number</dt>
+                <dd className="font-semibold text-indigo-600">
+                  #{placedOrder.number}
+                </dd>
+              </div>
+
+              <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <dt className="text-slate-500">Recipient</dt>
                 <dd className="font-medium text-slate-900">
-                  {placedOrder.fullName}
+                  {placedOrder.shipping.fullName}
                 </dd>
               </div>
 
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <dt className="text-slate-500">Email</dt>
                 <dd className="font-medium text-slate-900">
-                  {placedOrder.email}
+                  {placedOrder.shipping.email}
                 </dd>
               </div>
 
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <dt className="text-slate-500">Shipping Address</dt>
                 <dd className="font-medium text-slate-900">
-                  {placedOrder.address}, {placedOrder.city}
+                  {placedOrder.shipping.address}, {placedOrder.shipping.city}
                 </dd>
               </div>
 
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <dt className="text-slate-500">Items</dt>
                 <dd className="font-medium text-slate-900">
-                  {placedOrder.itemCount}
+                  {itemsCount}
                 </dd>
               </div>
 
@@ -160,10 +173,17 @@ export function CheckoutPage() {
             </dl>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              to={`/orders/${placedOrder.id}`}
+              state={{ justPlaced: true }}
+              className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-700 sm:w-auto"
+            >
+              View order details
+            </Link>
             <Link
               to="/"
-              className="inline-flex items-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-700"
+              className="inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:w-auto"
             >
               Continue shopping
             </Link>
