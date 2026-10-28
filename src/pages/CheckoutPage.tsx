@@ -99,8 +99,8 @@ export function CheckoutPage() {
 
     return (
       <Container className="py-12">
-        <div className="mx-auto max-w-xl rounded-2xl border border-emerald-200 bg-white p-6 text-center shadow-xs sm:p-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+        <div className="mx-auto max-w-xl rounded-2xl border border-emerald-200 bg-white p-6 text-center shadow-xs sm:p-8 dark:border-emerald-900 dark:bg-slate-900">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
             <svg
               className="h-8 w-8"
               fill="none"
@@ -116,57 +116,57 @@ export function CheckoutPage() {
             </svg>
           </div>
 
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
             Thank you! Your order has been placed.
           </h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             Order #{placedOrder.number} has been received and will begin processing shortly.
           </p>
 
-          <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-6 text-left">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700">
+          <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-6 text-left dark:border-slate-800 dark:bg-slate-800/60">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Order Details
             </h2>
 
             <dl className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                <dt className="text-slate-500">Order Number</dt>
-                <dd className="font-semibold text-indigo-600">
+              <div className="flex justify-between border-b border-slate-200/60 pb-2 dark:border-slate-700/60">
+                <dt className="text-slate-500 dark:text-slate-400">Order Number</dt>
+                <dd className="font-semibold text-brand-600 dark:text-brand-400">
                   #{placedOrder.number}
                 </dd>
               </div>
 
-              <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                <dt className="text-slate-500">Recipient</dt>
-                <dd className="font-medium text-slate-900">
+              <div className="flex justify-between border-b border-slate-200/60 pb-2 dark:border-slate-700/60">
+                <dt className="text-slate-500 dark:text-slate-400">Recipient</dt>
+                <dd className="font-medium text-slate-900 dark:text-white">
                   {placedOrder.shipping.fullName}
                 </dd>
               </div>
 
-              <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                <dt className="text-slate-500">Email</dt>
-                <dd className="font-medium text-slate-900">
+              <div className="flex justify-between border-b border-slate-200/60 pb-2 dark:border-slate-700/60">
+                <dt className="text-slate-500 dark:text-slate-400">Email</dt>
+                <dd className="font-medium text-slate-900 dark:text-white">
                   {placedOrder.shipping.email}
                 </dd>
               </div>
 
-              <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                <dt className="text-slate-500">Shipping Address</dt>
-                <dd className="font-medium text-slate-900">
+              <div className="flex justify-between border-b border-slate-200/60 pb-2 dark:border-slate-700/60">
+                <dt className="text-slate-500 dark:text-slate-400">Shipping Address</dt>
+                <dd className="font-medium text-slate-900 dark:text-white">
                   {placedOrder.shipping.address}, {placedOrder.shipping.city}
                 </dd>
               </div>
 
-              <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                <dt className="text-slate-500">Items</dt>
-                <dd className="font-medium text-slate-900">
+              <div className="flex justify-between border-b border-slate-200/60 pb-2 dark:border-slate-700/60">
+                <dt className="text-slate-500 dark:text-slate-400">Items</dt>
+                <dd className="font-medium text-slate-900 dark:text-white">
                   {itemsCount}
                 </dd>
               </div>
 
-              <div className="flex justify-between pt-1 text-base font-bold text-slate-900">
+              <div className="flex justify-between pt-1 text-base font-bold text-slate-900 dark:text-white">
                 <dt>Order Total</dt>
-                <dd className="text-indigo-600">
+                <dd className="text-brand-600 dark:text-brand-400">
                   {formatPrice(placedOrder.total)}
                 </dd>
               </div>
@@ -177,13 +177,13 @@ export function CheckoutPage() {
             <Link
               to={`/orders/${placedOrder.id}`}
               state={{ justPlaced: true }}
-              className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-700 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-700 sm:w-auto"
             >
               View order details
             </Link>
             <Link
               to="/"
-              className="inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:w-auto"
+              className="inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:w-auto dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Continue shopping
             </Link>
@@ -196,17 +196,17 @@ export function CheckoutPage() {
   if (items.length === 0) {
     return (
       <Container className="py-12">
-        <div className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <div className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs dark:border-slate-800 dark:bg-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Checkout
           </h1>
-          <p className="mt-3 text-base text-slate-600">
+          <p className="mt-3 text-base text-slate-600 dark:text-slate-400">
             Your cart is empty. Add items before checking out.
           </p>
           <div className="mt-6">
             <Link
               to="/cart"
-              className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+              className="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               Return to cart
             </Link>
@@ -219,10 +219,10 @@ export function CheckoutPage() {
   return (
     <Container className="space-y-8 py-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           Checkout
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Please provide your shipping and contact information
         </p>
       </div>
@@ -231,9 +231,9 @@ export function CheckoutPage() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 lg:col-span-7"
+          className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:p-8 lg:col-span-7 dark:border-slate-800 dark:bg-slate-900"
         >
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
             Shipping Information
           </h2>
 
@@ -241,9 +241,9 @@ export function CheckoutPage() {
             <div>
               <label
                 htmlFor="fullName"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Full name
+                Full name <span className="text-rose-500">*</span>
               </label>
               <input
                 id="fullName"
@@ -256,24 +256,24 @@ export function CheckoutPage() {
                     setErrors((prev) => ({ ...prev, fullName: undefined }));
                   }
                 }}
-                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 ${
+                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white ${
                   errors.fullName
-                    ? "border-red-400 focus:border-red-500 focus:ring-red-200"
-                    : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-200"
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200"
+                    : "border-slate-300 focus:border-brand-600 focus:ring-brand-200 dark:border-slate-700"
                 }`}
                 placeholder="John Doe"
               />
               {errors.fullName && (
-                <p className="mt-1 text-xs text-red-600">{errors.fullName}</p>
+                <p className="mt-1 text-xs text-rose-600">{errors.fullName}</p>
               )}
             </div>
 
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Email
+                Email <span className="text-rose-500">*</span>
               </label>
               <input
                 id="email"
@@ -286,24 +286,24 @@ export function CheckoutPage() {
                     setErrors((prev) => ({ ...prev, email: undefined }));
                   }
                 }}
-                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 ${
+                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white ${
                   errors.email
-                    ? "border-red-400 focus:border-red-500 focus:ring-red-200"
-                    : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-200"
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200"
+                    : "border-slate-300 focus:border-brand-600 focus:ring-brand-200 dark:border-slate-700"
                 }`}
                 placeholder="john@example.com"
               />
               {errors.email && (
-                <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+                <p className="mt-1 text-xs text-rose-600">{errors.email}</p>
               )}
             </div>
 
             <div>
               <label
                 htmlFor="address"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Address
+                Address <span className="text-rose-500">*</span>
               </label>
               <input
                 id="address"
@@ -316,24 +316,24 @@ export function CheckoutPage() {
                     setErrors((prev) => ({ ...prev, address: undefined }));
                   }
                 }}
-                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 ${
+                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white ${
                   errors.address
-                    ? "border-red-400 focus:border-red-500 focus:ring-red-200"
-                    : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-200"
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200"
+                    : "border-slate-300 focus:border-brand-600 focus:ring-brand-200 dark:border-slate-700"
                 }`}
                 placeholder="123 Main Street"
               />
               {errors.address && (
-                <p className="mt-1 text-xs text-red-600">{errors.address}</p>
+                <p className="mt-1 text-xs text-rose-600">{errors.address}</p>
               )}
             </div>
 
             <div>
               <label
                 htmlFor="city"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                City
+                City <span className="text-rose-500">*</span>
               </label>
               <input
                 id="city"
@@ -346,15 +346,15 @@ export function CheckoutPage() {
                     setErrors((prev) => ({ ...prev, city: undefined }));
                   }
                 }}
-                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 ${
+                className={`mt-1.5 block w-full rounded-lg border px-3.5 py-2 text-sm text-slate-900 shadow-xs transition focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white ${
                   errors.city
-                    ? "border-red-400 focus:border-red-500 focus:ring-red-200"
-                    : "border-slate-300 focus:border-indigo-600 focus:ring-indigo-200"
+                    ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200"
+                    : "border-slate-300 focus:border-brand-600 focus:ring-brand-200 dark:border-slate-700"
                 }`}
                 placeholder="Tbilisi"
               />
               {errors.city && (
-                <p className="mt-1 text-xs text-red-600">{errors.city}</p>
+                <p className="mt-1 text-xs text-rose-600">{errors.city}</p>
               )}
             </div>
           </div>
@@ -362,16 +362,16 @@ export function CheckoutPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="cursor-pointer mt-4 flex w-full items-center justify-center rounded-lg bg-indigo-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer mt-4 flex w-full items-center justify-center rounded-lg bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Processing..." : "Place order"}
           </button>
         </form>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs lg:col-span-5">
-          <h2 className="text-lg font-bold text-slate-900">Order Summary</h2>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs lg:col-span-5 dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Order Summary</h2>
 
-          <div className="mt-4 max-h-64 divide-y divide-slate-100 overflow-y-auto pr-1">
+          <div className="mt-4 max-h-64 divide-y divide-slate-100 overflow-y-auto pr-1 dark:divide-slate-800">
             {items.map((item) => {
               const unitPrice = discountedPrice(
                 item.price,
@@ -388,17 +388,17 @@ export function CheckoutPage() {
                       alt={item.title}
                       width={40}
                       height={40}
-                      className="h-10 w-10 shrink-0 rounded-md bg-slate-50 object-contain p-1"
+                      className="h-10 w-10 shrink-0 rounded-md bg-slate-50 object-contain p-1 dark:bg-slate-800"
                     />
                     <div>
-                      <p className="line-clamp-1 font-medium text-slate-900">
+                      <p className="line-clamp-1 font-medium text-slate-900 dark:text-white">
                         {item.title}
                       </p>
-                      <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Qty: {item.quantity}</p>
                     </div>
                   </div>
 
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {formatPrice(unitPrice * item.quantity)}
                   </span>
                 </div>
@@ -406,31 +406,31 @@ export function CheckoutPage() {
             })}
           </div>
 
-          <dl className="mt-4 space-y-3 border-t border-slate-200 pt-4 text-sm">
-            <div className="flex justify-between text-slate-600">
+          <dl className="mt-4 space-y-3 border-t border-slate-200 pt-4 text-sm dark:border-slate-800">
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <dt>Subtotal</dt>
-              <dd className="font-medium text-slate-900">
+              <dd className="font-medium text-slate-900 dark:text-white">
                 {formatPrice(subtotal)}
               </dd>
             </div>
 
             {promoCode && discount > 0 && (
-              <div className="flex justify-between text-emerald-600">
+              <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                 <dt>Discount ({promoCode} −10%)</dt>
                 <dd className="font-medium">-{formatPrice(discount)}</dd>
               </div>
             )}
 
-            <div className="flex justify-between text-slate-600">
+            <div className="flex justify-between text-slate-600 dark:text-slate-400">
               <dt>Shipping</dt>
-              <dd className="font-medium text-slate-900">
+              <dd className="font-medium text-slate-900 dark:text-white">
                 {shippingCost === 0 ? "Free" : formatPrice(shippingCost)}
               </dd>
             </div>
 
-            <div className="border-t border-slate-200 pt-3 flex justify-between text-base font-bold text-slate-900">
+            <div className="border-t border-slate-200 pt-3 flex justify-between text-base font-bold text-slate-900 dark:border-slate-800 dark:text-white">
               <dt>Total</dt>
-              <dd className="text-indigo-600">{formatPrice(total)}</dd>
+              <dd className="text-brand-600 dark:text-brand-400">{formatPrice(total)}</dd>
             </div>
           </dl>
         </div>

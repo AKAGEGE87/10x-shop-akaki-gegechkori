@@ -178,10 +178,10 @@ export function CatalogPage() {
     <Container className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Catalog
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {loading
               ? "Loading products..."
               : total > 0
@@ -191,7 +191,7 @@ export function CatalogPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-12 dark:border-slate-800 dark:bg-slate-900">
         <div className="sm:col-span-2 lg:col-span-5">
           <label htmlFor="search" className="sr-only">
             Search products
@@ -203,9 +203,9 @@ export function CatalogPage() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by product name..."
-              className="w-full rounded-lg border border-slate-300 py-2 pr-4 pl-9 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-9 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:ring-brand-900/50"
             />
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-500">
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -231,7 +231,7 @@ export function CatalogPage() {
             id="category"
             value={category}
             onChange={handleCategoryChange}
-            className="cursor-pointer w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            className="cursor-pointer w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-900/50"
           >
             <option value="">All categories</option>
             {categories.map((cat) => (
@@ -250,7 +250,7 @@ export function CatalogPage() {
             id="sort"
             value={sort}
             onChange={handleSortChange}
-            className="cursor-pointer w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            className="cursor-pointer w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-brand-900/50"
           >
             <option value="">Default</option>
             <option value="price-asc">Price: low to high</option>
@@ -264,15 +264,15 @@ export function CatalogPage() {
       {loading && <ProductGridSkeleton count={12} />}
 
       {error && !loading && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center dark:border-rose-900 dark:bg-rose-950/40">
+          <p className="text-sm font-semibold uppercase tracking-wide text-rose-600 dark:text-rose-400">
             Error loading catalog
           </p>
-          <p className="mt-2 text-base text-red-900">{error}</p>
+          <p className="mt-2 text-base text-rose-900 dark:text-rose-200">{error}</p>
           <button
             type="button"
             onClick={() => setRetryCount((c) => c + 1)}
-            className="cursor-pointer mt-4 inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="cursor-pointer mt-4 inline-flex items-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
           >
             Retry
           </button>
@@ -280,18 +280,18 @@ export function CatalogPage() {
       )}
 
       {!loading && !error && data && data.products.length === 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs">
-          <p className="text-base font-medium text-slate-700">
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-base font-medium text-slate-700 dark:text-slate-300">
             No products found.
           </p>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Try adjusting your search query or filters.
           </p>
           <div className="mt-6">
             <button
               type="button"
               onClick={handleClearFilters}
-              className="cursor-pointer inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="cursor-pointer inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
             >
               Clear filters
             </button>

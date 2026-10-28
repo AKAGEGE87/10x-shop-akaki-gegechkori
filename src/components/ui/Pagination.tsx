@@ -41,7 +41,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         type="button"
         disabled={page <= 1}
         onClick={() => onChange(page - 1)}
-        className="cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+        className="cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         aria-label="Previous page"
       >
         &#8249;
@@ -52,7 +52,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
           return (
             <span
               key={`ellipsis-${index}`}
-              className="inline-flex h-9 w-9 items-center justify-center text-sm font-medium text-slate-400 select-none"
+              className="inline-flex h-9 w-9 items-center justify-center text-sm font-medium text-slate-400 select-none dark:text-slate-600"
             >
               &hellip;
             </span>
@@ -66,10 +66,10 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
             key={p}
             type="button"
             onClick={() => onChange(Number(p))}
-            className={`cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+            className={`cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-500 ${
               isCurrent
-                ? "bg-indigo-600 text-white shadow-xs"
-                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                ? "bg-brand-600 text-white shadow-xs"
+                : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             }`}
             aria-current={isCurrent ? "page" : undefined}
           >
@@ -82,7 +82,7 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
         type="button"
         disabled={page >= totalPages}
         onClick={() => onChange(page + 1)}
-        className="cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+        className="cursor-pointer inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         aria-label="Next page"
       >
         &#8250;
